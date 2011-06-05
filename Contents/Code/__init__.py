@@ -1,108 +1,151 @@
-#opensubtitles.org
-#Subtitles service allowed by www.OpenSubtitles.org
+#hdbits.org
 
-OS_API = 'http://api.opensubtitles.org/xml-rpc'
-OS_LANGUAGE_CODES = 'http://www.opensubtitles.org/addons/export_languages.php'
+import string, os
+
+HDBITS_MAIN = "https://hdbits.org/"
+HDBITS_SEARCH_PAGE = "https://hdbits.org/dox.php?%s=1&search=%s"
+HDBITS_LOGIN_PAGE = 'https://hdbits.org/login.php'
+HDBITS_LOGON_PAGE = 'https://hdbits.org/takelogon.php'
 OS_PLEX_USERAGENT = 'plexapp.com v9.0'
 subtitleExt       = ['utf','utf8','utf-8','sub','srt','smi','rt','ssa','aqt','jss','ass','idx']
- 
+
+langPrefs2HDbits = {'eng':'uk', 'swe':'se'}
+#Find these in the DefaultPrefs.json and http://dev.plexapp.com/docs/api/localekit.html#locale-language
+langPrefs2Plex = {'eng':'en', 'swe':'sv'}
+
 def Start():
-  HTTP.CacheTime = CACHE_1DAY
-  HTTP.Headers['User-agent'] = 'plexapp.com v9.0'
+    HTTP.CacheTime = 0
+    HTTP.Headers['User-agent'] = OS_PLEX_USERAGENT
+    Log("START CALLED")
 
-@expose
-def GetImdbIdFromHash(openSubtitlesHash, lang):
-  proxy = XMLRPC.Proxy(OS_API)
-  try:
-    os_movieInfo = proxy.CheckMovieHash('',[openSubtitlesHash])
-  except:
-    return None
-    
-  if os_movieInfo['data'][openSubtitlesHash] != []:
-    return MetadataSearchResult(
-      id    = "tt" + str(os_movieInfo['data'][openSubtitlesHash]['MovieImdbID']),
-      name  = str(os_movieInfo['data'][openSubtitlesHash]['MovieName']),
-      year  = int(os_movieInfo['data'][openSubtitlesHash]['MovieYear']),
-      lang  = lang,
-      score = 90)
-  else:
-    return None
-  
-class OpenSubtitlesAgentMovies(Agent.Movies):
-  name = 'OpenSubtitles.org'
-  languages = [Locale.Language.English]
-  primary_provider = False
-  contributes_to = ['com.plexapp.agents.imdb']
-  
-  def search(self, results, media, lang):
-    results.Append(MetadataSearchResult(
-      id    = 'null',
-      score = 100  ))
-    
-  def update(self, metadata, media, lang):
-    HTTP.Headers['User-agent'] = 'plexapp.com v9.0'
-    
-    proxy = XMLRPC.Proxy(OS_API)
-    for i in media.items:
-      for p in i.parts:
-        token = proxy.LogIn('', '', 'en', OS_PLEX_USERAGENT)['token']
-        langList = [Prefs["langPref1"]]
-        if Prefs["langPref2"] != 'None':
-          langList.append(Prefs["langPref2"])
-        for l in langList:
-          Log('Looking for match for GUID %s and size %d' % (p.openSubtitleHash, p.size))
-          subtitleResponse = proxy.SearchSubtitles(token,[{'sublanguageid':l, 'moviehash':p.openSubtitleHash, 'moviebytesize':str(p.size)}])['data']
-          if subtitleResponse != False:
-            for st in subtitleResponse: #remove any subtitle formats we don't recognize
-              if st['SubFormat'] not in subtitleExt:
-                Log('Removing a subtitle of type: ' + st['SubFormat'])
-                subtitleResponse.remove(st)
-            st = sorted(subtitleResponse, key=lambda k: int(k['SubDownloadsCnt']), reverse=True)[0] #most downloaded subtitle file for current language
-            if st['SubFormat'] in subtitleExt:
-              subUrl = st['SubDownloadLink']
-              subGz = HTTP.Request(subUrl, headers={'Accept-Encoding':''}).content
-              subData = Archive.GzipDecompress(subGz)
-              p.subtitles[Locale.Language.Match(st['SubLanguageID'])][subUrl] = Proxy.Media(subData, ext=st['SubFormat'])
-          else:
-            Log('No subtitles available for language ' + l)
+def checkLogin():
+    Log("checkLogin")
+#TODO: Instead of trusting the server to redirect us to the login page if we're not logged in. Check for the cookie
+    #instead with HTTP.GetCookiesForURL(url)?
 
-class OpenSubtitlesAgentTV(Agent.TV_Shows):
-  name = 'OpenSubtitles.org'
-  languages = [Locale.Language.English]
-  primary_provider = False
-  contributes_to = ['com.plexapp.agents.thetvdb']
+    elem = HTML.ElementFromURL(HDBITS_MAIN)
+    lols = elem.xpath("//form//input[@name='lol']/@value")
+    Log("lols %s" % lols)
 
-  def search(self, results, media, lang):
-    results.Append(MetadataSearchResult(
-      id    = 'null',
-      score = 100  ))
+    if len(lols) == 1:
+        lol = str(lols[0])
+        values = {'uname':Prefs['username'],'password':Prefs['password'],'lol':lol}
+        elem2 = HTML.ElementFromURL(HDBITS_LOGON_PAGE, values=values)
+        svar1 = HTML.StringFromElement(elem2)
+        #Log('Svar1: %s' % svar1)
 
-  def update(self, metadata, media, lang):
-    HTTP.Headers['User-agent'] = 'plexapp.com v9.0'
-    proxy = XMLRPC.Proxy(OS_API)
-    for s in media.seasons:
-      # just like in the Local Media Agent, if we have a date-based season skip for now.
-      if int(s) < 1900:
-        for e in media.seasons[s].episodes:
-          for i in media.seasons[s].episodes[e].items:
-            for p in i.parts:
-              token = proxy.LogIn('', '', 'en', OS_PLEX_USERAGENT)['token']
-              langList = [Prefs["langPref1"]]
-              if Prefs["langPref2"] != 'None':
-                langList.append(Prefs["langPref2"])
-              for l in langList:
-                Log('Looking for match for GUID %s and size %d' % (p.openSubtitleHash, p.size))
-                subtitleResponse = proxy.SearchSubtitles(token,[{'sublanguageid':l, 'moviehash':p.openSubtitleHash, 'moviebytesize':str(p.size)}])['data']
-                if subtitleResponse != False:
-                  for st in subtitleResponse: #remove any subtitle formats we don't recognize
-                    if st['SubFormat'] not in subtitleExt:
-                      Log('Removing a subtitle of type: ' + st['SubFormat'])
-                      subtitleResponse.remove(st)
-                  st = sorted(subtitleResponse, key=lambda k: int(k['SubDownloadsCnt']), reverse=True)[0] #most downloaded subtitle file for current language
-                  if st['SubFormat'] in subtitleExt:
-                    subUrl = st['SubDownloadLink']
-                    subGz = HTTP.Request(subUrl, headers={'Accept-Encoding':''}).content
-                    subData = Archive.GzipDecompress(subGz)
-                    p.subtitles[Locale.Language.Match(st['SubLanguageID'])][subUrl] = Proxy.Media(subData, ext=st['SubFormat'])
-                else:
-                  Log('No subtitles available for language ' + l)
+#Prepare a list of languages we want subs for
+def getLangList():
+    langList = [Prefs["langPref1"]]
+    if(Prefs["langPref2"] != "None"):
+        langList.append(Prefs["langPref2"])
+
+    return langList
+
+
+#Do a basic search for the filename and return all sub urls found
+def simpleSearch(fileName, lang = 'eng'):
+#First make sure we are logged in
+    checkLogin() 
+
+#Prepare the filename for search by removing the suffix and other nuisances
+    lastDotIndex = string.rfind(fileName, '.')
+    if(lastDotIndex > -1):
+        fileName = fileName[0:lastDotIndex]
+
+    fileName = string.replace(fileName, '.', ' ')
+    fileName = string.replace(fileName, '(',' ')
+    fileName = string.replace(fileName, ')',' ')
+    fileName = string.replace(fileName, '-',' ')
+    Log("Searching for: %s" % fileName)
+
+    urlName = String.Quote(fileName, usePlus=True)
+    Log("escaped file name: %s" % urlName)
+    searchUrl = HDBITS_SEARCH_PAGE % (langPrefs2HDbits[lang], urlName)
+    Log("searchUrl: %s" % searchUrl)
+    elem = HTML.ElementFromURL(searchUrl)
+    #Log("Search page: %s" % HTML.StringFromElement(elem))
+
+#Find all sub urls on this page and return the link/url to them
+    subtitles = elem.xpath("//a[starts-with(@href,'getdox.php')]/@href")
+    for subtitle in subtitles:
+        Log("Subtitle: %s" % subtitle)
+
+    return subtitles
+
+class SubInfo():
+    lang = None
+    url = None
+    sub = None
+    subExt = None
+
+def getSubsForPart(part):
+    fileName = os.path.basename(part.file)
+    Log("Filename: %s" % fileName)
+#For each language defined in preferences, do a search
+    subsList = []
+    for lang in getLangList():
+        plexLang = Locale.Language.Match(langPrefs2Plex[lang])
+        Log("LangTest: %s" % plexLang)
+        subtitleUrls = simpleSearch(fileName, lang)
+#For each sub found. Fetch it and hand it over to Plex with the right language and suffix set
+        for url in subtitleUrls:
+            splitUrl = string.split(url, '/')
+            splitUrl[-1] = String.Quote(splitUrl[-1], usePlus=True)
+            url = string.join(splitUrl, '/')
+            subUrl = HDBITS_MAIN + url
+            subExt = string.split(url, '.')[-1] #Find suffix for this sub type
+            Log("SubUrl: %s" % subUrl)
+            Log("SubExt: %s" % subExt)
+            sub = HTTP.Request(subUrl, immediate=True).content
+            si = SubInfo()
+            si.lang = plexLang
+            si.url = url
+            si.sub = sub
+            si.subExt = subExt
+            subsList.append(si)
+            #part.subtitles[plexLang][url] = Proxy.Media(sub, ext=subExt)
+    return subsList
+
+class HdbitsSubtitlesAgentMovies(Agent.Movies):
+    name = 'HDBits.org Subtitles Movies'
+    languages = [Locale.Language.English]
+    primary_provider = False
+    contributes_to = ['com.plexapp.agents.imdb']
+
+    def search(self, results, media, lang):
+        Log("MOVIE SEARCH CALLED")    
+        results.Append(MetadataSearchResult(id = 'null', score = 100))
+
+    def update(self, metadata, media, lang):
+            Log("MOVIE UPDATE CALLED")
+            for item in media.items:
+                for part in item.parts:
+                    subsList = getSubsForPart(part)
+                    for si in subsList:
+                        part.subtitles[si.lang][si.url] = Proxy.Media(si.sub, si.subExt)
+
+class HdbitsSubtitlesAgentMovies(Agent.TV_Shows):
+    name = 'HDBits.org TV Subtitles'
+    languages = [Locale.Language.English]
+    primary_provider = False
+    contributes_to = ['com.plexapp.agents.thetvdb']
+
+    def search(self, results, media, lang):
+        Log("TV SEARCH CALLED")    
+        results.Append(MetadataSearchResult(id = 'null', score = 100))
+
+    def update(self, metadata, media, lang):
+        Log("TvUpdate. Lang %s" % lang)
+        for season in media.seasons:
+            for episode in media.seasons[season].episodes:
+                for item in media.seasons[season].episodes[episode].items:
+                    for part in item.parts:
+                        subsList = getSubsForPart(part)
+                        Log("Found %d subs" % len(subsList))
+                        i = 0
+                        for si in subsList:
+                            Log("Lang: %s, url: %s, ext:%s" % (si.lang, si.url, si.subExt)) 
+                            Log("sublen: %d", len(si.sub))
+                            part.subtitles[si.lang][str(i)] = Proxy.Media(si.sub, si.subExt)
+                            i = i + 1 
