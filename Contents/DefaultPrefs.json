@@ -1,5 +1,21 @@
 [
         {
+                "id":                   "username",
+                "label":                "Username:",
+                "type":         "text",
+                "default":      "Username..."
+        },
+
+        {
+                "id":                   "password",
+                "label":                "password",
+                "type":         "text",
+                "option":       "hidden",
+                "default":      "",
+                "secure":   "true"
+        },
+
+        {
                 "id": "langPref1",
                 "label": "Subtitle Language (1)",
                 "type": "enum",
