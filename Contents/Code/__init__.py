@@ -32,7 +32,6 @@ def checkLogin():
         values = {'uname':Prefs['username'],'password':Prefs['password'],'lol':lol}
         elem2 = HTML.ElementFromURL(HDBITS_LOGON_PAGE, values=values)
         svar1 = HTML.StringFromElement(elem2)
-        #Log('Svar1: %s' % svar1)
 
 #Prepare a list of languages we want subs for
 def getLangList():
@@ -104,7 +103,6 @@ def getSubsForPart(part):
             si.sub = sub
             si.subExt = subExt
             subsList.append(si)
-            #part.subtitles[plexLang][url] = Proxy.Media(sub, ext=subExt)
     return subsList
 
 class HdbitsSubtitlesAgentMovies(Agent.Movies):
@@ -123,7 +121,7 @@ class HdbitsSubtitlesAgentMovies(Agent.Movies):
                 for part in item.parts:
                     subsList = getSubsForPart(part)
                     for si in subsList:
-                        part.subtitles[si.lang][si.url] = Proxy.Media(si.sub, si.subExt)
+                        part.subtitles[si.lang][si.url] = Proxy.Media(si.sub, ext=si.subExt)
 
 class HdbitsSubtitlesAgentMovies(Agent.TV_Shows):
     name = 'HDBits.org TV Subtitles'
@@ -143,9 +141,5 @@ class HdbitsSubtitlesAgentMovies(Agent.TV_Shows):
                     for part in item.parts:
                         subsList = getSubsForPart(part)
                         Log("Found %d subs" % len(subsList))
-                        i = 0
                         for si in subsList:
-                            Log("Lang: %s, url: %s, ext:%s" % (si.lang, si.url, si.subExt)) 
-                            Log("sublen: %d", len(si.sub))
-                            part.subtitles[si.lang][str(i)] = Proxy.Media(si.sub, ext=si.subExt)
-                            i = i + 1 
+                            part.subtitles[si.lang][si.url] = Proxy.Media(si.sub, ext=si.subExt)
