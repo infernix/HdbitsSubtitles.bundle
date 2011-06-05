@@ -147,5 +147,5 @@ class HdbitsSubtitlesAgentMovies(Agent.TV_Shows):
                         for si in subsList:
                             Log("Lang: %s, url: %s, ext:%s" % (si.lang, si.url, si.subExt)) 
                             Log("sublen: %d", len(si.sub))
-                            part.subtitles[si.lang][str(i)] = Proxy.Media(si.sub, si.subExt)
+                            part.subtitles[si.lang][str(i)] = Proxy.Media(si.sub, ext=si.subExt)
                             i = i + 1 
