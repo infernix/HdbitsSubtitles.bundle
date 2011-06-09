@@ -14,7 +14,7 @@ langPrefs2HDbits = {'eng':'uk', 'swe':'se'}
 langPrefs2Plex = {'eng':'en', 'swe':'sv'}
 
 def Start():
-    HTTP.CacheTime = 10000
+    HTTP.CacheTime = 0
     HTTP.Headers['User-agent'] = OS_PLEX_USERAGENT
     Log("START CALLED")
 
