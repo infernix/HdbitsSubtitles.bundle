@@ -14,7 +14,7 @@ langPrefs2HDbits = {'eng':'uk', 'swe':'se'}
 langPrefs2Plex = {'eng':'en', 'swe':'sv'}
 
 def Start():
-    HTTP.CacheTime = 0
+    HTTP.CacheTime = 10000
     HTTP.Headers['User-agent'] = OS_PLEX_USERAGENT
     Log("START CALLED")
 
@@ -96,13 +96,17 @@ def getSubsForPart(part):
             subExt = string.split(url, '.')[-1] #Find suffix for this sub type
             Log("SubUrl: %s" % subUrl)
             Log("SubExt: %s" % subExt)
-            sub = HTTP.Request(subUrl, immediate=True).content
-            si = SubInfo()
-            si.lang = plexLang
-            si.url = url
-            si.sub = sub
-            si.subExt = subExt
-            subsList.append(si)
+            if subExt in subtitleExt:
+                Log("subExt %s is ok" % subExt)
+                sub = HTTP.Request(subUrl, immediate=True).content
+                si = SubInfo()
+                si.lang = plexLang
+                si.url = url
+                si.sub = sub
+                si.subExt = subExt
+                subsList.append(si)
+            else:
+                Log("Can't handle sub of type: %s" % subExt)
     return subsList
 
 class HdbitsSubtitlesAgentMovies(Agent.Movies):
@@ -120,8 +124,12 @@ class HdbitsSubtitlesAgentMovies(Agent.Movies):
             for item in media.items:
                 for part in item.parts:
                     subsList = getSubsForPart(part)
+                    valid_names = list()
                     for si in subsList:
                         part.subtitles[si.lang][si.url] = Proxy.Media(si.sub, ext=si.subExt)
+                        valid_names.append(si.lang)
+                        part.subtitles[si.lang].validate_keys(valid_names)
+                        Log("Validating keys...")
 
 class HdbitsSubtitlesAgentMovies(Agent.TV_Shows):
     name = 'HDBits.org TV Subtitles'
@@ -135,11 +143,16 @@ class HdbitsSubtitlesAgentMovies(Agent.TV_Shows):
 
     def update(self, metadata, media, lang):
         Log("TvUpdate. Lang %s" % lang)
+        Log("media: %s" % media)
         for season in media.seasons:
             for episode in media.seasons[season].episodes:
                 for item in media.seasons[season].episodes[episode].items:
                     for part in item.parts:
                         subsList = getSubsForPart(part)
                         Log("Found %d subs" % len(subsList))
+                        valid_names = list()
                         for si in subsList:
                             part.subtitles[si.lang][si.url] = Proxy.Media(si.sub, ext=si.subExt)
+                            valid_names.append(si.url)
+                            Log("Validating keys...")
+                            part.subtitles[si.lang].validate_keys(valid_names)
