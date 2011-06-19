@@ -127,7 +127,7 @@ class HdbitsSubtitlesAgentMovies(Agent.Movies):
                     valid_names = list()
                     for si in subsList:
                         part.subtitles[si.lang][si.url] = Proxy.Media(si.sub, ext=si.subExt)
-                        valid_names.append(si.lang)
+                        valid_names.append(si.url)
                         part.subtitles[si.lang].validate_keys(valid_names)
                         Log("Validating keys...")
 
