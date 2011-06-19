@@ -9,7 +9,7 @@ HDBITS_LOGON_PAGE = 'https://hdbits.org/takelogon.php'
 OS_PLEX_USERAGENT = 'plexapp.com v9.0'
 subtitleExt       = ['utf','utf8','utf-8','sub','srt','smi','rt','ssa','aqt','jss','ass','idx']
 
-langPrefs2HDbits = {'eng':'uk', 'swe':'se'}
+langPrefs2HDbits = {'eng':'uk', 'swe':'se', 'alb':'', 'ara':'ar', 'bul':'bg', 'chi':'cn', 'hrv':'hr', 'cze':'cz', 'dan':'dk', 'dut':'nl', 'est':'ee', 'fin':'fi', 'fre':'fr', 'ger':'de', 'gre':'gr', 'heb':'il', 'hun':'hu', 'ita':'it', 'jpn':'jp', 'kor':'kr', 'nor':'no', 'pol':'pl', 'por':'pt', 'ron':'ro', 'rus':'ru', 'srp':'cs', 'slo':'sk', 'slv':'si', 'spa':'es', 'tur':'tr', 'oth':'zz'}
 #Find these in the DefaultPrefs.json and http://dev.plexapp.com/docs/api/localekit.html#locale-language
 langPrefs2Plex = {'eng':'en', 'swe':'sv'}
 
