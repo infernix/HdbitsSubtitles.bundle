@@ -9,9 +9,10 @@ HDBITS_LOGON_PAGE = 'https://hdbits.org/takelogon.php'
 OS_PLEX_USERAGENT = 'plexapp.com v9.0'
 subtitleExt       = ['utf','utf8','utf-8','sub','srt','smi','rt','ssa','aqt','jss','ass','idx']
 
-langPrefs2HDbits = {'eng':'uk', 'swe':'se', 'alb':'', 'ara':'ar', 'bul':'bg', 'chi':'cn', 'hrv':'hr', 'cze':'cz', 'dan':'dk', 'dut':'nl', 'est':'ee', 'fin':'fi', 'fre':'fr', 'ger':'de', 'gre':'gr', 'heb':'il', 'hun':'hu', 'ita':'it', 'jpn':'jp', 'kor':'kr', 'nor':'no', 'pol':'pl', 'por':'pt', 'ron':'ro', 'rus':'ru', 'srp':'cs', 'slo':'sk', 'slv':'si', 'spa':'es', 'tur':'tr', 'oth':'zz'}
+langPrefs2HDbits = {'eng':'uk', 'swe':'se', 'ara':'ar', 'bul':'bg', 'chi':'cn', 'hrv':'hr', 'cze':'cz', 'dan':'dk', 'dut':'nl', 'est':'ee', 'fin':'fi', 'fre':'fr', 'ger':'de', 'gre':'gr', 'heb':'il', 'hun':'hu', 'ita':'it', 'jpn':'jp', 'kor':'kr', 'nor':'no', 'pol':'pl', 'por':'pt', 'ron':'ro', 'rus':'ru', 'srp':'cs', 'slo':'sk', 'slv':'si', 'spa':'es', 'tur':'tr'}
+
 #Find these in the DefaultPrefs.json and http://dev.plexapp.com/docs/api/localekit.html#locale-language
-langPrefs2Plex = {'eng':'en', 'swe':'sv'}
+langPrefs2Plex = {'eng':'en', 'swe':'sv', 'ara':'ar', 'bul':'bg', 'chi':'zh', 'hrv':'hr', 'cze':'cs', 'dan':'da', 'dut':'nl', 'est':'et', 'fin':'fi', 'fre':'fr', 'ger':'de', 'gre':'el', 'heb':'he', 'hun':'hu', 'ita':'it', 'jpn':'ja', 'kor':'ko', 'nor':'no', 'pol':'pl', 'por':'pt', 'ron':'ro', 'rus':'ru', 'srp':'sr', 'slo':'sk', 'slv':'sl', 'spa':'es', 'tur':'tr'}
 
 def Start():
     HTTP.CacheTime = 0
