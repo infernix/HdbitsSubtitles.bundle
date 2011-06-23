@@ -32,5 +32,11 @@
                            "hun","ita","jpn","kor","nor","pol","por","ron","rus","srp","slo",
                            "slv","spa","swe","tur"],
                 "default": "None"
-        }        
+        },        
+        {
+            "id":                   "UseReleaseGroup",
+            "label":                "Incl. release group in search:",
+            "type":                 "bool",
+            "default":              "true",
+        }
 ]
