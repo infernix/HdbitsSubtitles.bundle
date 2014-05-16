@@ -5,7 +5,7 @@ import string, os
 HDBITS_MAIN = "https://hdbits.org/"
 HDBITS_SEARCH_PAGE = "https://hdbits.org/dox.php?%s=1&search=%s"
 HDBITS_LOGIN_PAGE = 'https://hdbits.org/login.php'
-HDBITS_LOGON_PAGE = 'https://hdbits.org/takelogon.php'
+HDBITS_LOGON_PAGE = 'https://hdbits.org/login/doLogin'
 OS_PLEX_USERAGENT = 'plexapp.com v9.0'
 subtitleExt       = ['utf','utf8','utf-8','sub','srt','smi','rt','ssa','aqt','jss','ass','idx']
 
