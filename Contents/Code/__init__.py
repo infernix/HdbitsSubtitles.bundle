@@ -47,6 +47,8 @@ def getLangList():
     langList = [Prefs["langPref1"]]
     if(Prefs["langPref2"] != "None"):
         langList.append(Prefs["langPref2"])
+    if(Prefs["langPref3"] != "None"):
+        langList.append(Prefs["langPref3"])
 
     return langList
 
