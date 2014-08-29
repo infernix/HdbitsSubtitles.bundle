@@ -1,51 +1,57 @@
 [
         {
-                "id":                   "username",
-                "label":                "Username:",
+                "id":           "username",
+                "label":        "Username:",
                 "type":         "text",
                 "default":      "Username..."
         },
 
         {
-                "id":                   "password",
-                "label":                "password",
+                "id":           "passkey",
+                "label":        "Passkey (from your profile page):",
                 "type":         "text",
                 "option":       "hidden",
                 "default":      "",
-                "secure":   "true"
+                "secure":	"true"
         },
 
         {
-                "id": "langPref1",
-                "label": "Subtitle Language (1)",
-                "type": "enum",
-                "values": ["eng","ara","bul","chi","hrv","cze","dan","dut","est","fin","fre","ger","gre","heb",
-                           "hun","ita","jpn","kor","nor","pol","por","ron","rus","srp","slo",
-                           "slv","spa","swe","tur"],
+                "id": 		"langPref1",
+                "label": 	"Subtitle Language (1)",
+                "type": 	"enum",
+                "values": 	["eng","ara","bul","chi","hrv","cze","dan","dut","est","fin","fre","ger","gre","heb","hun","ita","jpn","kor","nor","pol","por","ron","rus","srp","slo","slv","spa","swe","tur"],
                 "default": "eng"
         },
         {
-                "id": "langPref2",
-                "label": "Subtitle Language (2)",
-                "type": "enum",
-                "values": ["None","eng","ara","bul","chi","hrv","cze","dan","dut","est","fin","fre","ger","gre","heb",
-                           "hun","ita","jpn","kor","nor","pol","por","ron","rus","srp","slo",
-                           "slv","spa","swe","tur"],
-                "default": "None"
+                "id": 		"langPref2",
+                "label": 	"Subtitle Language (2)",
+                "type": 	"enum",
+                "values": 	["None","eng","ara","bul","chi","hrv","cze","dan","dut","est","fin","fre","ger","gre","heb","hun","ita","jpn","kor","nor","pol","por","ron","rus","srp","slo","slv","spa","swe","tur"],
+                "default": 	"None"
         },        
         {
-                "id": "langPref3",
-                "label": "Subtitle Language (3)",
-                "type": "enum",
-                "values": ["None","eng","ara","bul","chi","hrv","cze","dan","dut","est","fin","fre","ger","gre","heb",
-                           "hun","ita","jpn","kor","nor","pol","por","ron","rus","srp","slo",
-                           "slv","spa","swe","tur"],
-                "default": "None"
+                "id": 		"langPref3",
+                "label": 	"Subtitle Language (3)",
+                "type": 	"enum",
+                "values": 	["None","eng","ara","bul","chi","hrv","cze","dan","dut","est","fin","fre","ger","gre","heb","hun","ita","jpn","kor","nor","pol","por","ron","rus","srp","slo","slv","spa","swe","tur"],
+                "default": 	"None"
         },        
         {
-            "id":                   "UseReleaseGroup",
-            "label":                "Incl. release group in search:",
-            "type":                 "bool",
-            "default":              "true",
+		"id":           "SourceMatching",
+		"label":        "Enable source matching (more accurate):",
+		"type":         "bool",
+		"default":      "true"
+        },
+        {
+		"id":           "MoviesOther",
+		"label":        "Search 'Other' language category for movies",
+		"type":         "bool",
+		"default":      "false"
+        },
+        {
+		"id":           "TVOther",
+		"label":        "Search 'Other' language category for TV shows",
+		"type":         "bool",
+		"default":      "true"
         }
 ]
