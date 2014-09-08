@@ -11,6 +11,7 @@ import tempfile
 
 # TODO: put in checks to ensure we have a valid unrar(.exe)
 # TODO: Use the global dict() function to store credential verification state.
+# TODO: add preferences to skip commentary and/or SDH and/or forced
 
 # We need rarfile.py as many subtitle archives are in rar files.
 import rarfile
@@ -111,7 +112,7 @@ def Start():
 
 def BadFileName(filename):
     for word in badfilenames:
-        if word in filename:
+        if word.lower() in filename.lower():
             return True
     return False
 
@@ -465,6 +466,7 @@ class HdbitsSubtitlesAgentMovies(Agent.Movies):
                 torrents = GetListOfTorrents(mediatype,mediaid)
                 tcount = 0
                 sadded = 0
+                spresent = 0
                 sskipped = 0
                 for torrent in torrents:
                     tcount = tcount + 1
@@ -476,16 +478,21 @@ class HdbitsSubtitlesAgentMovies(Agent.Movies):
                             if extension in subtitleExt:
                                 si = GetSub(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid)
                                 if si is not None:
-                                    sadded = sadded + 1
-                                    Log.Info(logprefix + "adding id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
-                                    part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
-                            elif (extension == 'rar') or (extension == 'zip'):
-                                silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid)
-                                for si in silist:
-                                    if si is not None:
+                                    if not part.subtitles[si.lang][si.crc]:
                                         sadded = sadded + 1
                                         Log.Info(logprefix + "adding id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                         part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
+                                    else:
+                                        spresent = spresent + 1
+                            elif (extension == 'rar') or (extension == 'zip'):
+                                silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid)
+                                for si in silist:
+                                    if not part.subtitles[si.lang][si.crc]:
+                                        sadded = sadded + 1
+                                        Log.Info(logprefix + "adding id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
+                                        part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
+                                    else:
+                                        spresent = spresent + 1
                             else:
                                 sskipped = sskipped + 1
                                 Log.Debug(logprefix + "skipping: unsupported subtitle format for file " + str(subtitle["filename"]))
@@ -493,16 +500,21 @@ class HdbitsSubtitlesAgentMovies(Agent.Movies):
                             if extension in subtitleExt:
                                 si = GetSub(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid)
                                 if si is not None:
-                                    sadded = sadded + 1
-                                    Log.Info(logprefix + "adding id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
-                                    part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
-                            elif (extension == 'rar') or (extension == 'zip'):
-                                silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid)
-                                for si in silist:
-                                    if si is not None:
+                                    if not part.subtitles[si.lang][si.crc]:
                                         sadded = sadded + 1
                                         Log.Info(logprefix + "adding id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                         part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
+                                    else:
+                                        spresent = spresent + 1
+                            elif (extension == 'rar') or (extension == 'zip'):
+                                silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid)
+                                for si in silist:
+                                    if not part.subtitles[si.lang][si.crc]:
+                                        sadded = sadded + 1
+                                        Log.Info(logprefix + "adding id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
+                                        part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
+                                    else:
+                                        spresent = spresent + 1
                             else:
                                 sskipped = sskipped + 1
                                 Log.Debug(logprefix + "skipping: unsupported subtitle format for file " + str(subtitle["filename"]))
@@ -538,6 +550,7 @@ class HdbitsSubtitlesAgentTV(Agent.TV_Shows):
                         torrents = GetListOfTorrents(mediatype,mediaid,season,episode)
                         tcount = 0
                         sadded = 0
+                        spresent = 0
                         sskipped = 0
                         for torrent in torrents:
                             tcount = tcount + 1
@@ -549,17 +562,21 @@ class HdbitsSubtitlesAgentTV(Agent.TV_Shows):
                                     if extension in subtitleExt:
                                         si = GetSub(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season, episode)
                                         if si is not None:
-                                            sadded = sadded + 1
-                                            Log.Info(logprefix + "adding: id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
-                                            part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
-                                    elif (extension == 'rar') or (extension == 'zip'):
-                                        silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season, episode)
-                                        for si in silist:
-                                            if si is not None:
+                                            if not part.subtitles[si.lang][si.crc]:
                                                 sadded = sadded + 1
                                                 Log.Info(logprefix + "adding: id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                                 part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
-
+                                            else:
+                                                spresent = spresent + 1
+                                    elif (extension == 'rar') or (extension == 'zip'):
+                                        silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season, episode)
+                                        for si in silist:
+                                            if not part.subtitles[si.lang][si.crc]:
+                                                sadded = sadded + 1
+                                                Log.Info(logprefix + "adding: id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
+                                                part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
+                                            else:
+                                                spresent = spresent + 1
                                     else:
                                         Log.Debug(logprefix + "skipping: unsupported subtitle format for file " + str(subtitle["filename"]))
                                         sskipped = sskipped + 1
@@ -567,17 +584,21 @@ class HdbitsSubtitlesAgentTV(Agent.TV_Shows):
                                     if extension in subtitleExt:
                                         si = GetSub(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season, episode)
                                         if si is not None:
-                                            sadded = sadded + 1
-                                            Log.Info(logprefix + "adding: id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
-                                            part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
-                                    elif (extension == 'rar') or (extension == 'zip'):
-                                        silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season, episode)
-                                        for si in silist:
-                                            if si is not None:
+                                            if not part.subtitles[si.lang][si.crc]:
                                                 sadded = sadded + 1
                                                 Log.Info(logprefix + "adding: id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                                 part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
-
+                                            else:
+                                                spresent = spresent + 1
+                                    elif (extension == 'rar') or (extension == 'zip'):
+                                        silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season, episode)
+                                        for si in silist:
+                                            if not part.subtitles[si.lang][si.crc]:
+                                                sadded = sadded + 1
+                                                Log.Info(logprefix + "adding: id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
+                                                part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
+                                            else:
+                                                spresent + spresent + 1
                                     else:
                                         Log.Debug(logprefix + "skipping: unsupported subtitle format for file " + str(subtitle["filename"]))
                                         sskipped = sskipped + 1
