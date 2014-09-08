@@ -293,12 +293,14 @@ def GetListOfSubs(torrent,mediatype, mediaid):
     #pprint.pprint(subtitleresult)
     return result
 
-def GetSub(subtitle, torrent, mediafilename, mediatype, mediaid, season = None, episode = None):
+def GetSub(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season = None, episode = None):
     if mediatype == "movie":
         logprefix = "GetSub(" + str(mediatype) + "/" + str(mediaid) + "/" + str(torrent['id']) + '/' + str(subtitle['id']) + "): "
     elif mediatype == "tv":
         logprefix = "GetSub(" + str(mediatype) + "/" + str(mediaid) + "/" + str(torrent['id']) + '/' + str(subtitle['id']) + "/s" + str(season).zfill(2) + "e" + str(episode).zfill(2) + "): "
     mediasource = guessSource(mediafilename)
+    if mediasource == None:
+        guessSource(mediadirname)
     dlUrl = HDBITS_URL + "/getdox.php?id=" + subtitle["id"] + "&passkey=" + Prefs['passkey']
     dlExt = string.split(subtitle["filename"], '.')[-1].lower() #Find suffix for this sub type
     Log.Debug(logprefix + "subtitle filename " + str(subtitle["filename"]) + ", download extension " + str(dlExt))
@@ -323,7 +325,7 @@ def GetSub(subtitle, torrent, mediafilename, mediatype, mediaid, season = None, 
             # if we don't know our media source, or if it is disabled, accept anything
             # if we know our media source, match against sub name, sub filename, torrent filename or torrent name
             # often the torrent name is the accurate match. unfortunately we can't use the sites 'medium' ids due to the 'encode' class
-            Log.Debug(logprefix + "SourceMatching: media filename '" + str(mediafilename) + "' = " + str(mediasource) + ", sub name '" + str(subName) + "' = " + str(guessSource(subName)) + ", sub filename '" + str(subtitle["filename"]) + "' = " + str(guessSource(subtitle["filename"])) + ", torrent filename '" + str(torrent["filename"]) + "' = " + str(guessSource(torrent["filename"])) + ", torrent name '" + str(torrent["name"]) + "' = " + str(guessSource(torrent["name"])))
+            Log.Debug(logprefix + "SourceMatching: media name '" + str(mediadirname) + "/" + str(mediafilename) + "' = " + str(mediasource) + ", sub name '" + str(subName) + "' = " + str(guessSource(subName)) + ", sub filename '" + str(subtitle["filename"]) + "' = " + str(guessSource(subtitle["filename"])) + ", torrent filename '" + str(torrent["filename"]) + "' = " + str(guessSource(torrent["filename"])) + ", torrent name '" + str(torrent["name"]) + "' = " + str(guessSource(torrent["name"])))
             if ((mediasource == None) or (mediasource == guessSource(subName) or mediasource == guessSource(subtitle["filename"]) or mediasource == guessSource(torrent["filename"]) or mediasource == guessSource(torrent["name"]))):
                 try:
                     # It is possible we already downloaded this subtitle. We use subtitle['id'] as key here
@@ -341,7 +343,7 @@ def GetSub(subtitle, torrent, mediafilename, mediatype, mediaid, season = None, 
                     Log.Exception(logprefix + "Unknown error while downloading")
                     return None
             else:
-                Log.Debug(logprefix + "skipping: source mismatch for " + str(subName) + " against " + str(mediafilename))
+                Log.Debug(logprefix + "skipping: source mismatch for " + str(subName) + " against " + str(mediadirname) + "/" + str(mediafilename))
                 return None
 
 def GetSubArchive(subtitle, torrent, mediafilename, mediatype, mediaid, season = None, episode = None):
@@ -406,7 +408,7 @@ def GetSubArchive(subtitle, torrent, mediafilename, mediatype, mediaid, season =
                         try:
                             # if we don't know our media source, accept anything
                             # if we know our media source, match movie metadata filename against subtitle file, subtitle archive filename, or torrent filename
-                            Log.Debug(logprefix + "SourceMatching: media filename '" + str(mediafilename) + "' = " + str(mediasource) + ", sub name '" + str(subName) + "' = " + str(guessSource(subName)) + ", sub filename '" + str(subtitle["filename"]) + "' = " + str(guessSource(subtitle["filename"])) + ", torrent filename '" + str(torrent["filename"]) + "' = " + str(guessSource(torrent["filename"])) + ", torrent name '" + str(torrent["name"]) + "' = " + str(guessSource(torrent["name"])))
+                            Log.Debug(logprefix + "SourceMatching: media name '" + str(mediadirname) + "/" + str(mediafilename) + "' = " + str(mediasource) + ", sub name '" + str(subName) + "' = " + str(guessSource(subName)) + ", sub filename '" + str(subtitle["filename"]) + "' = " + str(guessSource(subtitle["filename"])) + ", torrent filename '" + str(torrent["filename"]) + "' = " + str(guessSource(torrent["filename"])) + ", torrent name '" + str(torrent["name"]) + "' = " + str(guessSource(torrent["name"])))
                             if ((mediasource == None) or (mediasource == guessSource(subName) or mediasource == guessSource(subtitle["filename"]) or mediasource == guessSource(torrent["filename"]) or mediasource == guessSource(torrent["name"]))):
                                 sub = archive.read(subName)
                                 if(mediatype == "movie"):
@@ -459,6 +461,7 @@ class HdbitsSubtitlesAgentMovies(Agent.Movies):
         for item in media.items:
             for part in item.parts:
                 mediafilename = os.path.basename(part.file)
+                mediadirname = os.path.basename(os.path.dirname(part.file))
                 torrents = GetListOfTorrents(mediatype,mediaid)
                 tcount = 0
                 sadded = 0
@@ -471,13 +474,13 @@ class HdbitsSubtitlesAgentMovies(Agent.Movies):
                         extension = string.split(subtitle["filename"], '.')[-1].lower()
                         if (subtitle["language"] in GetLangPrefs("hdbits")):
                             if extension in subtitleExt:
-                                si = GetSub(subtitle, torrent, mediafilename, mediatype, mediaid)
+                                si = GetSub(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid)
                                 if si is not None:
                                     sadded = sadded + 1
                                     Log.Info(logprefix + "adding id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                     part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
                             elif (extension == 'rar') or (extension == 'zip'):
-                                silist = GetSubArchive(subtitle, torrent, mediafilename, mediatype, mediaid)
+                                silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid)
                                 for si in silist:
                                     if si is not None:
                                         sadded = sadded + 1
@@ -488,13 +491,13 @@ class HdbitsSubtitlesAgentMovies(Agent.Movies):
                                 Log.Debug(logprefix + "skipping: unsupported subtitle format for file " + str(subtitle["filename"]))
                         elif (subtitle["language"] == "zz") and Prefs['MoviesOther'] == True:
                             if extension in subtitleExt:
-                                si = GetSub(subtitle, torrent, mediafilename, mediatype, mediaid)
+                                si = GetSub(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid)
                                 if si is not None:
                                     sadded = sadded + 1
                                     Log.Info(logprefix + "adding id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                     part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
                             elif (extension == 'rar') or (extension == 'zip'):
-                                silist = GetSubArchive(subtitle, torrent, mediafilename, mediatype, mediaid)
+                                silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid)
                                 for si in silist:
                                     if si is not None:
                                         sadded = sadded + 1
@@ -531,6 +534,7 @@ class HdbitsSubtitlesAgentTV(Agent.TV_Shows):
                 for item in media.seasons[season].episodes[episode].items:
                     for part in item.parts:
                         mediafilename = os.path.basename(part.file)
+                        mediadirname = os.path.basename(os.path.dirname(part.file))
                         torrents = GetListOfTorrents(mediatype,mediaid,season,episode)
                         tcount = 0
                         sadded = 0
@@ -543,13 +547,13 @@ class HdbitsSubtitlesAgentTV(Agent.TV_Shows):
                                 extension = string.split(subtitle["filename"], '.')[-1].lower()
                                 if (subtitle["language"] in GetLangPrefs("hdbits")):
                                     if extension in subtitleExt:
-                                        si = GetSub(subtitle, torrent, mediafilename, mediatype, mediaid, season, episode)
+                                        si = GetSub(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season, episode)
                                         if si is not None:
                                             sadded = sadded + 1
                                             Log.Info(logprefix + "adding: id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                             part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
                                     elif (extension == 'rar') or (extension == 'zip'):
-                                        silist = GetSubArchive(subtitle, torrent, mediafilename, mediatype, mediaid, season, episode)
+                                        silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season, episode)
                                         for si in silist:
                                             if si is not None:
                                                 sadded = sadded + 1
@@ -561,13 +565,13 @@ class HdbitsSubtitlesAgentTV(Agent.TV_Shows):
                                         sskipped = sskipped + 1
                                 elif (subtitle["language"] == "zz") and Prefs['MoviesOther'] == True:
                                     if extension in subtitleExt:
-                                        si = GetSub(subtitle, torrent, mediafilename, mediatype, mediaid, season, episode)
+                                        si = GetSub(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season, episode)
                                         if si is not None:
                                             sadded = sadded + 1
                                             Log.Info(logprefix + "adding: id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                             part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
                                     elif (extension == 'rar') or (extension == 'zip'):
-                                        silist = GetSubArchive(subtitle, torrent, mediafilename, mediatype, mediaid, season, episode)
+                                        silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season, episode)
                                         for si in silist:
                                             if si is not None:
                                                 sadded = sadded + 1
