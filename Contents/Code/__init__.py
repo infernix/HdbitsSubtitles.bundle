@@ -228,7 +228,7 @@ def guessSource(filename):
             return "WEB-DL"
         elif ("blu-ray" in searchstring or "bluray" in searchstring or "remux" in searchstring):
             return "Blu-Ray"
-        elif ("hddvd" in searchstring or "hd-dvd" in searchstring):
+        elif ("hddvd" in searchstring or "hd-dvd" in searchstring or "hd dvd" in searchstring):
             return "HDDVD"
         elif ("hdtv" in searchstring):
             return "HDTV"
