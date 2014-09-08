@@ -523,7 +523,7 @@ class HdbitsSubtitlesAgentMovies(Agent.Movies):
                             Log.Debug(logprefix + "skipping: language preference mismatch on " +  str(subtitle["filename"]) + " (" + str(subtitle["language"]) + ")")
                 logprefix = "HdbitsSubtitlesAgentMovies(" + str(mediaid) + "): "
                 stotal = sadded + sskipped
-                Log.Info(logprefix + str(stotal) + " subs found across " + str(tcount) + " torrents, " + str(sadded) + " matching subtitles added, " + str(sskipped) + " non-matching subtitles skipped")
+                Log.Info(logprefix + str(stotal) + " subs found across " + str(tcount) + " torrents, " + str(sadded) + " matching subtitles added, " + str(spresent) + " matching subtitles already present, " + str(sskipped) + " non-matching subtitles skipped")
 
 
 class HdbitsSubtitlesAgentTV(Agent.TV_Shows):
@@ -606,7 +606,7 @@ class HdbitsSubtitlesAgentTV(Agent.TV_Shows):
                                     Log.Debug(logprefix + "skipping: language preference mismatch on " +  str(subtitle["filename"]) + " (" + str(subtitle["language"]) + ")")
                         logprefix = "HdbitsSubtitlesAgentTV(" + str(mediaid) + "): "
                         stotal = sadded + sskipped
-                        Log.Info(logprefix + str(stotal) + " subs found across " + str(tcount) + " torrents, " + str(sadded) + " matching subtitles added, " + str(sskipped) + " non-matching subtitles skipped")
+                        Log.Info(logprefix + str(stotal) + " subs found across " + str(tcount) + " torrents, " + str(sadded) + " matching subtitles added, " + str(spresent) + " matching subtitles already present, " + str(sskipped) + " non-matching subtitles skipped")
     
     
     
