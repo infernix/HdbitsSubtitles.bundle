@@ -478,7 +478,7 @@ class HdbitsSubtitlesAgentMovies(Agent.Movies):
                             if extension in subtitleExt:
                                 si = GetSub(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid)
                                 if si is not None:
-                                    if not part.subtitles[si.lang][si.crc]:
+                                    if not si.crc in part.subtitles[si.lang]:
                                         sadded = sadded + 1
                                         Log.Info(logprefix + "adding id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                         part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
@@ -487,7 +487,7 @@ class HdbitsSubtitlesAgentMovies(Agent.Movies):
                             elif (extension == 'rar') or (extension == 'zip'):
                                 silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid)
                                 for si in silist:
-                                    if not part.subtitles[si.lang][si.crc]:
+                                    if not si.crc in part.subtitles[si.lang]:
                                         sadded = sadded + 1
                                         Log.Info(logprefix + "adding id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                         part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
@@ -500,7 +500,7 @@ class HdbitsSubtitlesAgentMovies(Agent.Movies):
                             if extension in subtitleExt:
                                 si = GetSub(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid)
                                 if si is not None:
-                                    if not part.subtitles[si.lang][si.crc]:
+                                    if not si.crc in part.subtitles[si.lang]:
                                         sadded = sadded + 1
                                         Log.Info(logprefix + "adding id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                         part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
@@ -509,7 +509,7 @@ class HdbitsSubtitlesAgentMovies(Agent.Movies):
                             elif (extension == 'rar') or (extension == 'zip'):
                                 silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid)
                                 for si in silist:
-                                    if not part.subtitles[si.lang][si.crc]:
+                                    if not si.crc in part.subtitles[si.lang]:
                                         sadded = sadded + 1
                                         Log.Info(logprefix + "adding id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                         part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
@@ -562,7 +562,7 @@ class HdbitsSubtitlesAgentTV(Agent.TV_Shows):
                                     if extension in subtitleExt:
                                         si = GetSub(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season, episode)
                                         if si is not None:
-                                            if not part.subtitles[si.lang][si.crc]:
+                                            if not si.crc in part.subtitles[si.lang]:
                                                 sadded = sadded + 1
                                                 Log.Info(logprefix + "adding: id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                                 part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
@@ -571,7 +571,7 @@ class HdbitsSubtitlesAgentTV(Agent.TV_Shows):
                                     elif (extension == 'rar') or (extension == 'zip'):
                                         silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season, episode)
                                         for si in silist:
-                                            if not part.subtitles[si.lang][si.crc]:
+                                            if not si.crc in part.subtitles[si.lang]:
                                                 sadded = sadded + 1
                                                 Log.Info(logprefix + "adding: id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                                 part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
@@ -584,7 +584,7 @@ class HdbitsSubtitlesAgentTV(Agent.TV_Shows):
                                     if extension in subtitleExt:
                                         si = GetSub(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season, episode)
                                         if si is not None:
-                                            if not part.subtitles[si.lang][si.crc]:
+                                            if not si.crc in part.subtitles[si.lang]:
                                                 sadded = sadded + 1
                                                 Log.Info(logprefix + "adding: id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                                 part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
@@ -593,7 +593,7 @@ class HdbitsSubtitlesAgentTV(Agent.TV_Shows):
                                     elif (extension == 'rar') or (extension == 'zip'):
                                         silist = GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season, episode)
                                         for si in silist:
-                                            if not part.subtitles[si.lang][si.crc]:
+                                            if not si.crc in part.subtitles[si.lang]:
                                                 sadded = sadded + 1
                                                 Log.Info(logprefix + "adding: id=" + str(si.id) + ", type=" + str(si.ext) + ", language=" + str(si.lang) + ", name=" + str(si.name))
                                                 part.subtitles[si.lang][si.crc] = Proxy.Media(si.sub, ext=si.ext)
