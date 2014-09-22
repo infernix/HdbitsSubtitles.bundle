@@ -347,7 +347,7 @@ def GetSub(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, s
                 Log.Debug(logprefix + "skipping: source mismatch for " + str(subName) + " against " + str(mediadirname) + "/" + str(mediafilename))
                 return None
 
-def GetSubArchive(subtitle, torrent, mediafilename, mediatype, mediaid, season = None, episode = None):
+def GetSubArchive(subtitle, torrent, mediafilename, mediadirname, mediatype, mediaid, season = None, episode = None):
     if mediatype == "movie":
         logprefix = "GetSubArchive(" + str(mediatype) + "/" + str(mediaid) + "/" + str(torrent['id']) + '/' + str(subtitle['id']) + "): "
     elif mediatype == "tv":
